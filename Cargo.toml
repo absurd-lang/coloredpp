@@ -1,0 +1,8 @@
+[package]
+name = "coloredpp"
+description = "Small crate for coloring and animating strings"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[dependencies]
