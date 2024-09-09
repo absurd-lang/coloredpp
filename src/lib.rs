@@ -33,6 +33,11 @@ pub trait Colorize {
     fn bg_bright_cyan(&self) -> String;
     fn bg_white(&self) -> String;
     fn bg_bright_white(&self) -> String;
+    // custom colors
+    fn fg_rgb(&self, r: u8, g: u8, b: u8) -> String;
+    fn bg_rgb(&self, r: u8, g: u8, b: u8) -> String;
+    fn fg_hex(&self, hex_color: &str) -> String;
+    fn bg_hex(&self, hex_color: &str) -> String;
     // other
     fn clear(&self) -> String;
     fn bold(&self) -> String;
@@ -42,18 +47,15 @@ pub trait Colorize {
     fn blink(&self) -> String;
     fn invert(&self) -> String;
     fn hide(&self) -> String;
+    fn fg_default(&self) -> String;
+    fn bg_default(&self) -> String;
+    fn overline(&self) -> String;
+    // remove
     fn remove_weight(&self) -> String;
     fn remove_underline(&self) -> String;
     fn remove_blink(&self) -> String;
     fn reveal(&self) -> String;
-    fn fg_default(&self) -> String;
-    fn bg_default(&self) -> String;
-    fn overline(&self) -> String;
-    fn fg_rgb(&self, r: u8, g: u8, b: u8) -> String;
-    fn bg_rgb(&self, r: u8, g: u8, b: u8) -> String;
 }
-
-// @todo handle recursion
 
 impl<T> Colorize for T
 where
@@ -188,41 +190,38 @@ where
     }
 
     fn clear(&self) -> String {
-        // @todo
         format!("\x1B[0m{}", self)
     }
 
     fn bold(&self) -> String {
-        format!("\x1B[1m{}\x1B[22m", self)
+        format!("\x1B[1m{}\x1B[22m\x1B[0m", self)
     }
 
     fn faint(&self) -> String {
-        format!("\x1B[2m{}\x1B[22m", self)
+        format!("\x1B[2m{}\x1B[22m\x1B[0m", self)
     }
 
     fn italic(&self) -> String {
-        format!("\x1B[3m{}\x1B[23m", self)
+        format!("\x1B[3m{}\x1B[23m\x1B[0m", self)
     }
 
     fn underline(&self) -> String {
-        format!("\x1B[4m{}\x1B[24m", self)
+        format!("\x1B[4m{}\x1B[24m\x1B[0m", self)
     }
 
     fn blink(&self) -> String {
-        format!("\x1B[5m{}\x1B[25m", self)
+        format!("\x1B[5m{}\x1B[25m\x1B[0m", self)
     }
 
     fn invert(&self) -> String {
-        format!("\x1B[7m{}\x1B[27m", self)
+        format!("\x1B[7m{}\x1B[27m\x1B[0m", self)
     }
 
     fn hide(&self) -> String {
-        // todo
-        format!("\x1B[8m{}\x1B[28m", self)
+        format!("\x1B[8m{}\x1B[28m\x1B[0m", self)
     }
 
     fn reveal(&self) -> String {
-        // todo
         self.hide()
     }
 
@@ -260,4 +259,30 @@ where
     fn bg_rgb(&self, r: u8, g: u8, b: u8) -> String {
         format!("\x1B[48;2;{};{};{}m{}\x1B[49m", r, g, b, self)
     }
+
+    fn fg_hex(&self, hex: &str) -> String {
+        let (r, g, b) = hex_to_rgb(hex).unwrap_or((0, 0, 0));
+        format!("\x1B[38;2;{};{};{}m{}\x1B[39m", r, g, b, self)
+    }
+    fn bg_hex(&self, hex: &str) -> String {
+        let (r, g, b) = hex_to_rgb(hex).unwrap_or((0, 0, 0));
+        format!("\x1B[48;2;{};{};{}m{}\x1B[49m", r, g, b, self)
+    }
+}
+
+fn hex_to_rgb(hex_color: &str) -> Option<(u8, u8, u8)> {
+    let hex = hex_color.trim_start_matches('#');
+    if hex.len() != 6 {
+        return None;
+    }
+
+    let mut rgb = [0u8; 3];
+    for i in 0..3 {
+        match u8::from_str_radix(&hex[i * 2..i * 2 + 2], 16) {
+            Ok(val) => rgb[i] = val,
+            Err(_) => return None,
+        }
+    }
+
+    Some((rgb[0], rgb[1], rgb[2]))
 }

@@ -1,6 +1,6 @@
 # Colored++
 
-Small cargo crate for coloring and animating text on the terminal
+Lighweight crate for coloring and animating texts on the terminal
 
 ## installation
 

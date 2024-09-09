@@ -1,5 +1,5 @@
 use coloredpp::Colorize;
 
 fn main() {
-    println!("{}", "hi".red());
+    println!("{} world", "hello".red());
 }
