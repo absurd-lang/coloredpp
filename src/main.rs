@@ -1,5 +1,5 @@
 use coloredpp::Colorize;
 
 fn main() {
-    println!("{} world", "hello".red());
+    println!("{} world", "hello".bg_hex_gradient("#000000", "#ffffff"))
 }

@@ -38,6 +38,11 @@ pub trait Colorize {
     fn bg_rgb(&self, r: u8, g: u8, b: u8) -> String;
     fn fg_hex(&self, hex_color: &str) -> String;
     fn bg_hex(&self, hex_color: &str) -> String;
+    // gradient
+    fn fg_gradient(&self, from: (u8, u8, u8), to: (u8, u8, u8)) -> String;
+    fn bg_gradient(&self, from: (u8, u8, u8), to: (u8, u8, u8)) -> String;
+    fn fg_hex_gradient(&self, from: &str, to: &str) -> String;
+    fn bg_hex_gradient(&self, from: &str, to: &str) -> String;
     // other
     fn clear(&self) -> String;
     fn bold(&self) -> String;
@@ -267,6 +272,82 @@ where
     fn bg_hex(&self, hex: &str) -> String {
         let (r, g, b) = hex_to_rgb(hex).unwrap_or((0, 0, 0));
         format!("\x1B[48;2;{};{};{}m{}\x1B[49m", r, g, b, self)
+    }
+
+    fn fg_gradient(&self, from: (u8, u8, u8), to: (u8, u8, u8)) -> String {
+        let mut result = String::new();
+        let steps = self.to_string().len();
+        let mut colors = vec![];
+        for i in 0..steps {
+            let r = from.0 as i32 + i as i32 * (to.0 as i32 - from.0 as i32) / (steps - 1) as i32;
+            let g = from.1 as i32 + i as i32 * (to.1 as i32 - from.1 as i32) / (steps - 1) as i32;
+            let b = from.2 as i32 + i as i32 * (to.2 as i32 - from.2 as i32) / (steps - 1) as i32;
+
+            colors.push((r as u8, g as u8, b as u8));
+        }
+        for (i, c) in self.to_string().chars().enumerate() {
+            let (r, g, b) = colors.get(i).unwrap();
+            result.push_str(&c.fg_rgb(*r, *g, *b));
+        }
+        result
+    }
+
+    fn bg_gradient(&self, from: (u8, u8, u8), to: (u8, u8, u8)) -> String {
+        let mut result = String::new();
+        let steps = self.to_string().len();
+        let mut colors = vec![];
+        for i in 0..steps {
+            let r = from.0 as i32 + i as i32 * (to.0 as i32 - from.0 as i32) / (steps - 1) as i32;
+            let g = from.1 as i32 + i as i32 * (to.1 as i32 - from.1 as i32) / (steps - 1) as i32;
+            let b = from.2 as i32 + i as i32 * (to.2 as i32 - from.2 as i32) / (steps - 1) as i32;
+
+            colors.push((r as u8, g as u8, b as u8));
+        }
+        for (i, c) in self.to_string().chars().enumerate() {
+            let (r, g, b) = colors.get(i).unwrap();
+            result.push_str(&c.bg_rgb(*r, *g, *b));
+        }
+        result
+    }
+
+    fn fg_hex_gradient(&self, from: &str, to: &str) -> String {
+        let from = hex_to_rgb(from).unwrap();
+        let to = hex_to_rgb(to).unwrap();
+        let mut result = String::new();
+        let steps = self.to_string().len();
+        let mut colors = vec![];
+        for i in 0..steps {
+            let r = from.0 as i32 + i as i32 * (to.0 as i32 - from.0 as i32) / (steps - 1) as i32;
+            let g = from.1 as i32 + i as i32 * (to.1 as i32 - from.1 as i32) / (steps - 1) as i32;
+            let b = from.2 as i32 + i as i32 * (to.2 as i32 - from.2 as i32) / (steps - 1) as i32;
+
+            colors.push((r as u8, g as u8, b as u8));
+        }
+        for (i, c) in self.to_string().chars().enumerate() {
+            let (r, g, b) = colors.get(i).unwrap();
+            result.push_str(&c.fg_rgb(*r, *g, *b));
+        }
+        result
+    }
+
+    fn bg_hex_gradient(&self, from: &str, to: &str) -> String {
+        let from = hex_to_rgb(from).unwrap();
+        let to = hex_to_rgb(to).unwrap();
+        let mut result = String::new();
+        let steps = self.to_string().len();
+        let mut colors = vec![];
+        for i in 0..steps {
+            let r = from.0 as i32 + i as i32 * (to.0 as i32 - from.0 as i32) / (steps - 1) as i32;
+            let g = from.1 as i32 + i as i32 * (to.1 as i32 - from.1 as i32) / (steps - 1) as i32;
+            let b = from.2 as i32 + i as i32 * (to.2 as i32 - from.2 as i32) / (steps - 1) as i32;
+
+            colors.push((r as u8, g as u8, b as u8));
+        }
+        for (i, c) in self.to_string().chars().enumerate() {
+            let (r, g, b) = colors.get(i).unwrap();
+            result.push_str(&c.bg_rgb(*r, *g, *b));
+        }
+        result
     }
 }
 

@@ -1,8 +1,9 @@
 [package]
 name = "coloredpp"
 description = "Lighweight crate for coloring texts"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 license = "MIT"
+readme = "Readme.md"
 
 [dependencies]
